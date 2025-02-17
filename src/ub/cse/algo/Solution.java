@@ -2,6 +2,7 @@ package ub.cse.algo;
 
 import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.Stack;
 
 /**
  * For use in CSE 331 HW1.
@@ -54,17 +55,38 @@ public class Solution {
 			s is assigned to h
 			s′ is assigned to no hospital
 			h prefers s′ to s
-					2):
+		Instability 2):
 		There are students s and s′, and hospitals h and h′, so that:
 			s is assigned to h
 			s′ is assigned to h'
 			h prefers s′ to s
 			s′ prefers h to h′
 		 */
+		ArrayList<Match> matches = new ArrayList<>();
 		//STEP 1: BUILD THE _hospitalList
 		//STEP 2: BUILD THE _studentList
-		//STEP 3: RUN GALE-SHAPLEY
-        // Returns an empty ArrayList for now
-        return new ArrayList<Match>();
+		//STEP 3: RUN MODIFIED GALE-SHAPLEY
+		for(int hospital : _hospitalList.keySet()){
+			while(/*this hospital has available slots*/) {
+				//the nature of this for loop will find the highest ranked free student
+				//or otherwise the highest ranked student who'd also prefer this one
+				for (int student : _hospitalList.get(hospital)) {
+					//hospital offers a position to the next student on its preference list
+					if (/*that student is free*/) {
+						//that student accepts
+					}
+					//that student is otherwise commited
+					else {
+						if (/*if that student prefers the proposer to their current hospital*/) {
+							//number of slots for the new hospital decreases
+							//number of slots for the old hospital increases
+						} else {
+							//do nothing, move on to the next most preferable student
+						}
+					}
+				}
+			}
+		}
+        return matches;
 	}
 }
