@@ -44,6 +44,35 @@ public class Solution {
      * but they must remain within the HW1_Student_Solution class.
      * @return Your stable matches
      */
+	public Match getPreviousMatch(int student, ArrayList<Match> matches){
+		for(Match match : matches){
+			if(match.student == student){
+				return match;
+			}
+		}
+		return null;
+	}
+
+	public boolean studentPrefersNew(int student, int hospitalPrev, int hospitalNew){
+		int prevIdx = 0;
+		int newIdx = 0;
+		//cycle til we find index of hospitalPrev
+		for(int i = 0; i < _nHospital; i++){
+			if(_studentList.get(student).get(i) == hospitalPrev){
+				prevIdx = i;
+			}
+		}
+		//cycle til we find index of hospitalNew
+		for(int i = 0; i < _nHospital; i++){
+			if(_studentList.get(student).get(i) == hospitalNew){
+				newIdx = i;
+			}
+		}
+		if(prevIdx < newIdx){
+			return false;
+		}
+		return true;
+	}
 	public ArrayList<Match> getMatches() {
 		//OUTPUT A STABLE MATCHING
         //Some students may be unassigned
@@ -63,26 +92,38 @@ public class Solution {
 			s′ prefers h to h′
 		 */
 		ArrayList<Match> matches = new ArrayList<>();
-		//STEP 1: BUILD THE _hospitalList
-		//STEP 2: BUILD THE _studentList
-		//STEP 3: RUN MODIFIED GALE-SHAPLEY
+		//student and hospital lists are prebuilt, just need to pass to
+		//our main algo
+		//RUNNING MODIFIED GALE-SHAPLEY
 		for(int hospital : _hospitalList.keySet()){
-			while(/*this hospital has available slots*/) {
+			//while there are empty slots at this hospital
+			//number of slots located at _hospitalList.get(hospital).get(0);
+			int numOfSlots = _hospitalList.get(hospital).get(0);
+			while(numOfSlots != 0) {
 				//the nature of this for loop will find the highest ranked free student
 				//or otherwise the highest ranked student who'd also prefer this one
-				for (int student : _hospitalList.get(hospital)) {
+				for (int student = 1; student <= _nStudent; student++) {
 					//hospital offers a position to the next student on its preference list
-					if (/*that student is free*/) {
+					//if that student is free
+					if (getPreviousMatch(student,matches) == null){
 						//that student accepts
+						Match newMatch = new Match(hospital,student);
+						matches.add(newMatch);
+						_hospitalList.get(hospital).set(0,numOfSlots-1);
+						numOfSlots--;
 					}
-					//that student is otherwise commited
+					//else, that student is otherwise commited
 					else {
-						if (/*if that student prefers the proposer to their current hospital*/) {
+						int prevHospital = getPreviousMatch(student,matches).hospital;
+						if (studentPrefersNew(student,prevHospital,hospital)) {
 							//number of slots for the new hospital decreases
+							_hospitalList.get(hospital).set(0,numOfSlots-1);
+							numOfSlots--;
 							//number of slots for the old hospital increases
-						} else {
-							//do nothing, move on to the next most preferable student
+							//be careful not to use numOfSlots here
+							_hospitalList.get(prevHospital).set(0,_hospitalList.get(prevHospital).get(0)+1);
 						}
+						//otherwise move on to the next most preferable student
 					}
 				}
 			}
